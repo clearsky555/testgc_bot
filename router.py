@@ -37,3 +37,24 @@ dp.register_callback_query_handler(
     hs.set_user_data,
     lambda c: c.data=='register',
 )
+
+dp.register_callback_query_handler(
+    hs.process_user_family_status,
+    lambda c: c.data == 'single',
+    state=UserAddState.process_user_family_status,
+)
+dp.register_callback_query_handler(
+    hs.process_user_family_status,
+    lambda c: c.data == 'married',
+    state=UserAddState.process_user_family_status,
+)
+dp.register_callback_query_handler(
+    hs.process_user_family_status,
+    lambda c: c.data == 'divorced',
+    state=UserAddState.process_user_family_status,
+)
+dp.register_callback_query_handler(
+    hs.process_user_family_status,
+    lambda c: c.data == 'widowed',
+    state=UserAddState.process_user_family_status,
+)

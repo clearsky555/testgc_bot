@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
-from bot_utils.keyboards import get_menu_button
+from bot_utils.keyboards import get_menu_button, get_family_status_button
 
 from state import UserAddState
 
@@ -74,12 +74,34 @@ async def add_user_name(message: Message, state: FSMContext):
 async def add_user_surname(message: Message, state: FSMContext):
     async with state.proxy() as data:
         data['surname'] = message.text
+    text = 'Теперь отправьте семейное положение'
+    # await UserAddState.add_user_family_status.set()
+
+    markup = get_family_status_button()
+
+    await message.answer(text, reply_markup=markup)
+    async with state.proxy() as data:
+        data['awaiting_family_status'] = True
+    await UserAddState.process_user_family_status.set()
+
+    print('функция отработала')
+
+
+async def process_user_family_status(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        family_status = callback.data
+        data['family_status'] = family_status
+        del data['awaiting_family_status']  # Убираем флаг ожидания
+
+    await callback.message.answer(f"Вы выбрали семейный статус: {family_status}")
     text = 'Теперь отправьте изображение'
-    await message.answer(text)
+    await callback.message.answer(text)
+
     await UserAddState.add_user_photo.set()
 
 
 async def add_user_photo(message: Message, state: FSMContext):
+    print('функция выбора фото запустилась')
     async with state.proxy() as data:
         data['photo'] = message.photo[-1]
 
@@ -88,6 +110,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             telegram_user_id = message.from_user.id
             name = data['name']
             surname = data['surname']
+            family_status = data['family_status']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -101,11 +124,11 @@ async def add_user_photo(message: Message, state: FSMContext):
 
             photo_url = photo_path
 
-            user_data = {'telegram_user_id': telegram_user_id, 'name': name, 'surname': surname, 'photo_url': photo_url}
+            user_data = {'telegram_user_id': telegram_user_id, 'name': name, 'surname': surname, 'photo_url': photo_url, 'family_status': family_status}
             users_manager.record_user_in_db(user_data)
             await message.answer('Данные успешно записаны в базу данных!')
         except Exception as ex:
             print(ex)
-            await message.answer('Что-то пошло не так...')
+            await message.answer('произошла ошибка, пожалуйста, перезапустите бота, нажав start...')
 
         await state.finish()
