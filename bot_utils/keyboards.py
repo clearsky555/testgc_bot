@@ -1,10 +1,19 @@
 from aiogram import types
 
 
+def get_language_button():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    kyrgyz = types.InlineKeyboardButton('Кыргызча', callback_data='kyrgyz')
+    russian = types.InlineKeyboardButton('Русский', callback_data='russian')
+    markup.add(kyrgyz, russian)
+    return markup
+
+
 def get_menu_button():
     markup = types.InlineKeyboardMarkup(row_width=1)
     info = types.InlineKeyboardButton('Информация', callback_data='info')
     register = types.InlineKeyboardButton('Регистрация', callback_data='register')
+    # cancel = types.InlineKeyboardButton('отмена', callback_data='cancel')
     markup.add(info, register)
     return markup
 

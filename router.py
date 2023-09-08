@@ -15,7 +15,8 @@ dp = Dispatcher(bot, storage=storage)
 
 # router
 # commands
-dp.register_message_handler(hs.welcome_message, commands=['start'])
+# dp.register_message_handler(hs.welcome_message, commands=['start'])
+dp.register_message_handler(hs.language_selection, commands=['start'])
 
 dp.register_message_handler(hs.set_user_data, state=UserAddState.add_user)
 dp.register_message_handler(hs.add_user_name, state=UserAddState.add_user_name)
@@ -31,11 +32,13 @@ dp.register_message_handler(
 dp.register_callback_query_handler(
     hs.get_info,
     lambda c: c.data=='info',
+    state=UserAddState.user_language
 )
 
 dp.register_callback_query_handler(
     hs.set_user_data,
     lambda c: c.data=='register',
+    state=UserAddState.user_language
 )
 
 dp.register_callback_query_handler(
@@ -58,3 +61,20 @@ dp.register_callback_query_handler(
     lambda c: c.data == 'widowed',
     state=UserAddState.process_user_family_status,
 )
+
+dp.register_callback_query_handler(
+    hs.welcome_message,
+    lambda c: c.data == 'russian',
+    state=UserAddState.user_language,
+)
+
+dp.register_callback_query_handler(
+    hs.welcome_message,
+    lambda c: c.data == 'kyrgyz',
+    state=UserAddState.user_language,
+)
+
+# dp.register_callback_query_handler(
+#     hs.language_selection,
+#     lambda c: c.data == 'cancel'
+# )
