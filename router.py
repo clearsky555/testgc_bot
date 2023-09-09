@@ -77,5 +77,17 @@ dp.register_callback_query_handler(
 dp.register_callback_query_handler(
     hs.restart_bot,
     lambda c: c.data == 'cancel',
-    state=UserAddState.user_language,
+    state=UserAddState,
+)
+
+# dp.register_callback_query_handler(
+#     hs.back_to_welcome_message,
+#     lambda c: c.data == 'back',
+#     state=UserAddState,
+# )
+
+dp.register_callback_query_handler(
+    hs.set_user_data,
+    lambda c: c.data == 'back_to_name',
+    state=UserAddState,
 )

@@ -4,6 +4,8 @@ import uuid
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
+from transliterate import translit
+
 
 from bot_utils.keyboards import get_menu_button, get_family_status_button, get_language_button
 
@@ -19,6 +21,14 @@ async def restart_bot(callback: types.CallbackQuery, state):
     await language_selection(callback.message)
 
 
+# async def back_to_welcome_message(callback: types.CallbackQuery, state):
+#     async with state.proxy() as data:
+#         print(f'это вывод state data из back_to_welcome_message: {data}')
+#         print(callback.data)
+#     await UserAddState.user_language.set()
+#     await welcome_message(callback, state)
+
+
 async def language_selection(message: types.Message):
     text = 'Добрый день, я бот для регистрации на лотерею green card. Пожалуйста, выберите язык'
     markup = get_language_button()
@@ -30,12 +40,16 @@ async def language_selection(message: types.Message):
 async def welcome_message(callback: types.callback_query, state):
     async with state.proxy() as data:
         data['language'] = callback.data
-        print(data)
+        # print(data)
+        # if callback.data != 'back':  # Update language only if callback.data is not 'back'
+        #     data['language'] = callback.data
+        # print(data)
     if callback.data == 'russian':
         text = 'язык установлен на русский'
     else:
-        text = 'кыргыз тили'
-    markup = get_menu_button()
+        text = 'тил кыргызча болгондоо(кыргызский язык)'
+
+    markup = get_menu_button(language=callback.data)
     await callback.message.answer(text, reply_markup=markup)
 
 
@@ -57,17 +71,21 @@ async def get_info(callback: types.callback_query, state):
                 '''
         else:
             text = '''
-            Информация на кыргызском
-            Коротко и просто:
-
-            Чтобы участвовать в лотерее, достаточно иметь среднее образование.
-            Участвовать могут уроженцы почти всех стран, в том числе и все, кто родился на территории республик бывшего СССР.
-            Чтобы стать участником, нужно заполнить анкету с указанием биографических сведений.
-            К анкете требуются фотографии всех членов семьи (супруги и дети до 21 года).
-            Не быть судимым, не нарушать визово-иммиграционные законы США, не иметь социально-опасных заболеваний.
-            Что необходимо для участия?
-
-                Остальная информация по ссылке: http://greencard.by/lottery/rules/
+            Эртеңчи жана орнотпооңуз:
+            
+            Лотереяга үчүн жетишкен орто-мектептин жеткендери өтүү жеткиликтүү.
+            
+            Лотереяга үчүн жеткилишүүчү мамлекеттин өмүр калган адамдар, анын ичинде өмүр калган республиканын беренче кайсысында жашаганлар таттуу мүмкүн.
+            
+            Жардамкер болуу үчүн, биографиялык маалыматты камтыбашкалуу форма толтурулуп берилиш керек.
+            
+            Куштардын бардык жана 21 жашга чейинки балдарынын суреттери кирет.
+            
+            Жалааишы болбоо, АКШ виза-иммиграция эмес жасалган миграция кагаздарынын укуктарын жашыруу, социалдуу-кайрымтуу жана опасдуу кишкентайтуу жамааттык жазылууларды алууга чек.
+            
+            Кандайча үчүн керек?
+            
+            Калган маалыматты бул сылтамадан окуңуз:  http://greencard.by/lottery/rules/
                 '''
 
     await callback.message.answer(text)
@@ -78,28 +96,59 @@ async def set_user_data(callback: types.CallbackQuery, state):
         language = data['language']
         if language == 'russian':
             text = 'Пожалуйста, введите ваше имя'
+            back_text = 'Назад'
         else:
-            text = 'Атыңызды киргизиниз'
-    await callback.message.answer(text)
+            text = 'Атыңызды киргизиниз(введите имя)'
+            back_text = 'Артка(назад)'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='cancel')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await callback.message.answer(text, reply_markup=markup)
+
     await UserAddState.add_user_name.set()
 
 
 async def add_user_name(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        data['name'] = message.text
+        name = message.text
+        name = translit(name, language_code='ru', reversed=True)
+
+        data['name'] = name
         print(data)
-    text = 'Теперь введите вашу фамилию'
-    await message.answer(text)
+        language = data['language']
+        if language == 'russian':
+            text = 'введите вашу фамилию'
+            back_text = 'Назад'
+        else:
+            text = 'Тегерегиңизди киргизиңиз(введите фамилию)'
+            back_text = 'Артка(назад)'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+
     await UserAddState.add_user_surname.set()
 
 
 async def add_user_surname(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        data['surname'] = message.text
-    text = 'Теперь отправьте семейное положение'
+        surname = message.text
+        surname = translit(surname, language_code='ru', reversed=True)
+        data['surname'] = surname
+        language = data['language']
+        if language == 'russian':
+            text = 'укажите ваше семейное положение'
+            back_text = 'Назад'
+        else:
+            text = 'Тегерек жолуңузду белгилеңиз(ваше семейное положение)'
+            back_text = 'Артка(назад)'
+    # text = 'Теперь отправьте семейное положение'
     # await UserAddState.add_user_family_status.set()
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
 
-    markup = get_family_status_button()
+    markup = get_family_status_button(language=data['language']).add(back_button)
 
     await message.answer(text, reply_markup=markup)
     async with state.proxy() as data:
@@ -114,9 +163,14 @@ async def process_user_family_status(callback: types.CallbackQuery, state: FSMCo
         family_status = callback.data
         data['family_status'] = family_status
         del data['awaiting_family_status']  # Убираем флаг ожидания
+        language = data['language']
+        if language == 'russian':
+            text = 'отправьте вашу фотографию'
+        else:
+            text = 'Сурөтүңүздү жөнөтүңүз(фотография)'
 
     await callback.message.answer(f"Вы выбрали семейный статус: {family_status}")
-    text = 'Теперь отправьте изображение'
+    # text = 'Теперь отправьте изображение'
     await callback.message.answer(text)
 
     await UserAddState.add_user_photo.set()
@@ -151,6 +205,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             await message.answer('Данные успешно записаны в базу данных!')
         except Exception as ex:
             print(ex)
+            await state.finish()
             await message.answer('произошла ошибка, пожалуйста, перезапустите бота, нажав start...')
 
         finally:
