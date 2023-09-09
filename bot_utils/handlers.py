@@ -12,6 +12,13 @@ from state import UserAddState
 from db.database import users_manager
 
 
+async def restart_bot(callback: types.CallbackQuery, state):
+    text = 'перезапуск бота'
+    await callback.message.answer(text)
+    await state.finish()
+    await language_selection(callback.message)
+
+
 async def language_selection(message: types.Message):
     text = 'Добрый день, я бот для регистрации на лотерею green card. Пожалуйста, выберите язык'
     markup = get_language_button()

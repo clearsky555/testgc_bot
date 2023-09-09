@@ -74,7 +74,8 @@ dp.register_callback_query_handler(
     state=UserAddState.user_language,
 )
 
-# dp.register_callback_query_handler(
-#     hs.language_selection,
-#     lambda c: c.data == 'cancel'
-# )
+dp.register_callback_query_handler(
+    hs.restart_bot,
+    lambda c: c.data == 'cancel',
+    state=UserAddState.user_language,
+)
