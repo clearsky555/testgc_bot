@@ -5,6 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 from transliterate import translit
+from googletrans import Translator
 
 
 from bot_utils.keyboards import get_menu_button, get_family_status_button, get_language_button
@@ -12,6 +13,8 @@ from bot_utils.keyboards import get_menu_button, get_family_status_button, get_l
 from state import UserAddState
 
 from db.database import users_manager
+
+translator = Translator()
 
 
 async def restart_bot(callback: types.CallbackQuery, state):
@@ -129,6 +132,7 @@ async def add_user_name(message: Message, state: FSMContext):
 
     await message.answer(text, reply_markup=markup)
 
+    # await UserAddState.add_user_surname.set()
     await UserAddState.add_user_surname.set()
 
 
@@ -139,13 +143,28 @@ async def add_user_surname(message: Message, state: FSMContext):
         data['surname'] = surname
         language = data['language']
         if language == 'russian':
+            text = 'укажите вашу страну'
+            # back_text = 'Назад'
+        else:
+            text = 'Өз улуттуу өлкөнү көрсөтүңүз(ваша страна)'
+            # back_text = 'Артка(назад)'
+    await message.answer(text)
+    await UserAddState.add_country.set()
+
+
+async def add_country(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        country = message.text
+        country = translator.translate(country, src='ru', dest='en').text
+        data['country'] = country
+        language = data['language']
+        if language == 'russian':
             text = 'укажите ваше семейное положение'
             back_text = 'Назад'
         else:
             text = 'Тегерек жолуңузду белгилеңиз(ваше семейное положение)'
             back_text = 'Артка(назад)'
-    # text = 'Теперь отправьте семейное положение'
-    # await UserAddState.add_user_family_status.set()
+
     back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
 
     markup = get_family_status_button(language=data['language']).add(back_button)
@@ -187,6 +206,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             name = data['name']
             surname = data['surname']
             family_status = data['family_status']
+            country = data['country']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -200,7 +220,15 @@ async def add_user_photo(message: Message, state: FSMContext):
 
             photo_url = photo_path
 
-            user_data = {'telegram_user_id': telegram_user_id, 'name': name, 'surname': surname, 'photo_url': photo_url, 'family_status': family_status}
+            user_data = {
+                'telegram_user_id': telegram_user_id,
+                'name': name,
+                'surname': surname,
+                'photo_url': photo_url,
+                'family_status': family_status,
+                'country': country,
+
+            }
             users_manager.record_user_in_db(user_data)
             await message.answer('Данные успешно записаны в базу данных!')
         except Exception as ex:

@@ -27,6 +27,7 @@ class UsersManager:
             Column('name', String(100)),
             Column('surname', String(100)),
             Column('family_status', String(100)),
+            Column('country', String(100)),
             # Column('city', String(255)),
             # Column('street', String(255)),
             # Column('house', String(20)),

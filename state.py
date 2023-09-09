@@ -9,3 +9,4 @@ class UserAddState(StatesGroup):
     process_user_family_status = State()
     add_user_photo = State()
     user_language = State()
+    add_country = State()
