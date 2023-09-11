@@ -144,11 +144,16 @@ async def add_user_surname(message: Message, state: FSMContext):
         language = data['language']
         if language == 'russian':
             text = 'укажите вашу страну'
-            # back_text = 'Назад'
+            back_text = 'Назад'
         else:
             text = 'Өз улуттуу өлкөнү көрсөтүңүз(ваша страна)'
-            # back_text = 'Артка(назад)'
-    await message.answer(text)
+            back_text = 'Артка(назад)'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
     await UserAddState.add_country.set()
 
 
@@ -157,6 +162,29 @@ async def add_country(message: Message, state: FSMContext):
         country = message.text
         country = translator.translate(country, src='ru', dest='en').text
         data['country'] = country
+        language = data['language']
+        if language == 'russian':
+            text = 'укажите ваш город'
+            back_text = 'Назад'
+        else:
+            text = 'шаарды киргизиңиз(ваш город)'
+            back_text = 'Артка(назад)'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+    await UserAddState.add_city.set()
+
+    print('функция отработала')
+
+
+async def add_city(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        city = message.text
+        city = translator.translate(city, src='ru', dest='en').text
+        data['city'] = city
         language = data['language']
         if language == 'russian':
             text = 'укажите ваше семейное положение'
@@ -168,13 +196,10 @@ async def add_country(message: Message, state: FSMContext):
     back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
 
     markup = get_family_status_button(language=data['language']).add(back_button)
-
     await message.answer(text, reply_markup=markup)
     async with state.proxy() as data:
         data['awaiting_family_status'] = True
     await UserAddState.process_user_family_status.set()
-
-    print('функция отработала')
 
 
 async def process_user_family_status(callback: types.CallbackQuery, state: FSMContext):
@@ -207,6 +232,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             surname = data['surname']
             family_status = data['family_status']
             country = data['country']
+            city = data['city']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -227,6 +253,7 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'photo_url': photo_url,
                 'family_status': family_status,
                 'country': country,
+                'city': city,
 
             }
             users_manager.record_user_in_db(user_data)

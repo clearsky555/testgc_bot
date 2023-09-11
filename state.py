@@ -10,3 +10,4 @@ class UserAddState(StatesGroup):
     add_user_photo = State()
     user_language = State()
     add_country = State()
+    add_city = State()
