@@ -23,6 +23,7 @@ dp.register_message_handler(hs.add_user_name, state=UserAddState.add_user_name)
 dp.register_message_handler(hs.add_user_surname, state=UserAddState.add_user_surname)
 dp.register_message_handler(hs.add_country, state=UserAddState.add_country)
 dp.register_message_handler(hs.add_city, state=UserAddState.add_city)
+dp.register_message_handler(hs.add_street, state=UserAddState.add_street)
 dp.register_message_handler(
     hs.add_user_photo,
     content_types=[types.ContentType.PHOTO, types.ContentType.TEXT],

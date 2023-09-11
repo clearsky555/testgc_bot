@@ -29,7 +29,7 @@ class UsersManager:
             Column('family_status', String(100)),
             Column('country', String(100)),
             Column('city', String(255)),
-            # Column('street', String(255)),
+            Column('street', String(255)),
             # Column('house', String(20)),
             # Column('apartment', String(20), nullable=True),
             Column('photo_url', String(255)),

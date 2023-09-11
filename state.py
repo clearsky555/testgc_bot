@@ -11,3 +11,4 @@ class UserAddState(StatesGroup):
     user_language = State()
     add_country = State()
     add_city = State()
+    add_street = State()

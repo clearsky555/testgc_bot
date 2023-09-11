@@ -3,8 +3,8 @@ from aiogram import types
 
 def get_language_button():
     markup = types.InlineKeyboardMarkup(row_width=1)
-    kyrgyz = types.InlineKeyboardButton('Кыргызча', callback_data='kyrgyz')
-    russian = types.InlineKeyboardButton('Русский', callback_data='russian')
+    kyrgyz = types.InlineKeyboardButton('Кыргызча 🇰🇬', callback_data='kyrgyz')
+    russian = types.InlineKeyboardButton('Русский 🇷🇺', callback_data='russian')
     markup.add(kyrgyz, russian)
     return markup
 

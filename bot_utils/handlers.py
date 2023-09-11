@@ -187,6 +187,27 @@ async def add_city(message: Message, state: FSMContext):
         data['city'] = city
         language = data['language']
         if language == 'russian':
+            text = 'укажите вашу улицу'
+            back_text = 'Назад'
+        else:
+            text = 'көчөңүздү киргизиңиз (ваша улица)'
+            back_text = 'Артка(назад)'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = types.InlineKeyboardMarkup().add(back_button)
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.add_street.set()
+
+
+async def add_street(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        street = message.text
+        street = translit(street, language_code='ru', reversed=True)
+        data['street'] = street
+        language = data['language']
+        if language == 'russian':
             text = 'укажите ваше семейное положение'
             back_text = 'Назад'
         else:
@@ -233,6 +254,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             family_status = data['family_status']
             country = data['country']
             city = data['city']
+            street = data['street']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -254,7 +276,7 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'family_status': family_status,
                 'country': country,
                 'city': city,
-
+                'street': street,
             }
             users_manager.record_user_in_db(user_data)
             await message.answer('Данные успешно записаны в базу данных!')
