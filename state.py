@@ -18,3 +18,5 @@ class UserAddState(StatesGroup):
     add_country = State()
     add_city = State()
     add_street = State()
+    country_where_live = State()
+    email = State()

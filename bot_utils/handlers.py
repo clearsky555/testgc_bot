@@ -237,7 +237,7 @@ async def eligibility(callback: types.CallbackQuery, state: FSMContext):
 
         language = data['language']
         if language == 'russian':
-            text = 'укажите вашу страну'
+            text = 'ВАШ ПОЧТОВЫЙ АДРЕС.Укажите вашу страну(mailing address country)'
             back_text = 'Назад'
         else:
             text = 'Өз улуттуу өлкөнү көрсөтүңүз(ваша страна)'
@@ -258,7 +258,7 @@ async def add_country(message: Message, state: FSMContext):
         data['country'] = country
         language = data['language']
         if language == 'russian':
-            text = 'укажите ваш город'
+            text = 'укажите ваш город(mailing address city)'
             back_text = 'Назад'
         else:
             text = 'шаарды киргизиңиз(ваш город)'
@@ -281,7 +281,7 @@ async def add_city(message: Message, state: FSMContext):
         data['city'] = city
         language = data['language']
         if language == 'russian':
-            text = 'укажите вашу улицу'
+            text = 'укажите вашу улицу(mailing address street)'
             back_text = 'Назад'
         else:
             text = 'көчөңүздү киргизиңиз (ваша улица)'
@@ -300,6 +300,33 @@ async def add_street(message: Message, state: FSMContext):
         street = message.text
         street = translit(street, language_code='ru', reversed=True)
         data['street'] = street
+        text = 'укажите вашу страну пребывания(country where live today)'
+        back_text = 'Назад'
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.country_where_live.set()
+
+
+async def country_where_live(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        country_where_live = message.text
+        country_where_live = translit(country_where_live, language_code='ru', reversed=True)
+        data['country_where_live'] = country_where_live
+        text = 'укажите ваш email'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+    await message.answer(text, reply_markup=markup)
+    await UserAddState.email.set()
+
+
+async def email(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        email = message.text
+        data['email'] = email
         language = data['language']
         if language == 'russian':
             text = 'укажите ваше семейное положение'
@@ -355,6 +382,8 @@ async def add_user_photo(message: Message, state: FSMContext):
             birth_city = data['birth_city']
             birth_country = data['birth_country']
             country_of_eligibility = data['country_of_eligibility']
+            country_where_live = data['country_where_live']
+            email = data['email']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -383,6 +412,8 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'country': country,
                 'city': city,
                 'street': street,
+                'country_where_live': country_where_live,
+                'email': email,
             }
             users_manager.record_user_in_db(user_data)
             await message.answer('Данные успешно записаны в базу данных!')

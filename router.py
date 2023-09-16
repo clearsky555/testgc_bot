@@ -28,6 +28,9 @@ dp.register_message_handler(hs.add_birth_country, state=UserAddState.add_birth_c
 dp.register_message_handler(hs.add_country, state=UserAddState.add_country)
 dp.register_message_handler(hs.add_city, state=UserAddState.add_city)
 dp.register_message_handler(hs.add_street, state=UserAddState.add_street)
+dp.register_message_handler(hs.country_where_live, state=UserAddState.country_where_live)
+dp.register_message_handler(hs.email, state=UserAddState.email)
+
 dp.register_message_handler(
     hs.add_user_photo,
     content_types=[types.ContentType.PHOTO, types.ContentType.TEXT],
