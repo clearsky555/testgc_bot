@@ -32,6 +32,7 @@ class UsersManager:
             Column('birth_date', Date),
             Column('birth_city', String(100)),
             Column('birth_country', String(100)),
+            Column('country_of_eligibility', String(50)),
             Column('family_status', String(100)),
             Column('country', String(100)),
             Column('city', String(255)),

@@ -109,3 +109,16 @@ dp.register_callback_query_handler(
     lambda c: c.data == 'female',
     state=UserAddState.add_user_gender,
 )
+
+# eligibility
+dp.register_callback_query_handler(
+    hs.eligibility,
+    lambda c: c.data == 'eligibility_yes',
+    state=UserAddState.eligibility,
+)
+
+dp.register_callback_query_handler(
+    hs.eligibility,
+    lambda c: c.data == 'claiming_eligibility',
+    state=UserAddState.eligibility,
+)

@@ -220,6 +220,20 @@ async def add_birth_country(message: Message, state: FSMContext):
         birth_country = message.text
         birth_country = translator.translate(birth_country, src='ru', dest='en').text
         data['birth_country'] = birth_country
+        text = 'country of eligibility'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = get_eligibility_button().add(back_button)
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.eligibility.set()
+
+
+async def eligibility(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        country_of_eligibility = callback.data
+        data['country_of_eligibility'] = country_of_eligibility
 
         language = data['language']
         if language == 'russian':
@@ -233,7 +247,7 @@ async def add_birth_country(message: Message, state: FSMContext):
 
     markup = types.InlineKeyboardMarkup().add(back_button)
 
-    await message.answer(text, reply_markup=markup)
+    await callback.message.answer(text, reply_markup=markup)
     await UserAddState.add_country.set()
 
 
@@ -340,6 +354,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             birth_date = data['birth_date']
             birth_city = data['birth_city']
             birth_country = data['birth_country']
+            country_of_eligibility = data['country_of_eligibility']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -362,6 +377,7 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'birth_date': birth_date,
                 'birth_city': birth_city,
                 'birth_country': birth_country,
+                'country_of_eligibility': country_of_eligibility,
                 'photo_url': photo_url,
                 'family_status': family_status,
                 'country': country,

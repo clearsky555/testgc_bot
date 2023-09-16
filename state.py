@@ -11,6 +11,7 @@ class UserAddState(StatesGroup):
     add_birth_date = State()
     add_birth_city = State()
     add_birth_country = State()
+    eligibility = State()
     process_user_family_status = State()
     add_user_photo = State()
     user_language = State()

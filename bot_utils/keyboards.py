@@ -41,6 +41,14 @@ def get_gender_button():
     return markup
 
 
+def get_eligibility_button():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    yes = types.InlineKeyboardButton('yes', callback_data='eligibility_yes')
+    no = types.InlineKeyboardButton('country claiming eligibility', callback_data='claiming_eligibility')
+    markup.add(yes, no)
+    return markup
+
+
 def get_family_status_button(language):
     markup = types.InlineKeyboardMarkup(row_width=1)
     if language == 'russian':
