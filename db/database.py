@@ -6,6 +6,7 @@ from sqlalchemy import (
     Integer,
     String,
     BigInteger,
+    Date,
 )
 
 from config import MYSQL_URL
@@ -28,6 +29,9 @@ class UsersManager:
             Column('surname', String(100)),
             Column('middle_name', String(100)),
             Column('gender', String(50)),
+            Column('birth_date', Date),
+            Column('birth_city', String(100)),
+            Column('birth_country', String(100)),
             Column('family_status', String(100)),
             Column('country', String(100)),
             Column('city', String(255)),

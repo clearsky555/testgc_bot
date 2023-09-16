@@ -140,10 +140,6 @@ async def add_user_surname(message: Message, state:FSMContext):
         surname = message.text
         surname = translit(surname, language_code='ru', reversed=True)
         data['surname'] = surname
-
-        # middle_name = message.text
-        # middle_name = translit(middle_name, language_code='ru', reversed=True)
-        # data['middle_name'] = middle_name
         text = 'введите ваше отчество(middle_name)'
         back_text = 'Назад'
 
@@ -175,6 +171,55 @@ async def add_user_gender(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         gender = callback.data
         data['gender'] = gender
+        text = 'укажите вашу дату рождения в формате ГГГГ.ММ.ЧЧ, например - 2001.12.19(birth_date)'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await callback.message.answer(text, reply_markup=markup)
+
+    await UserAddState.add_birth_date.set()
+
+
+async def add_birth_date(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        birth_date = message.text
+        data['birth_date'] = birth_date
+        text = 'укажите ваш город рождения(birth_city)'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.add_birth_city.set()
+
+
+async def add_birth_city(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        birth_city = message.text
+        birth_city = translator.translate(birth_city, src='ru', dest='en').text
+        data['birth_city'] = birth_city
+        text = 'укажите вашу страну рождения(birth_city)'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.add_birth_country.set()
+
+
+async def add_birth_country(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        birth_country = message.text
+        birth_country = translator.translate(birth_country, src='ru', dest='en').text
+        data['birth_country'] = birth_country
 
         language = data['language']
         if language == 'russian':
@@ -188,7 +233,7 @@ async def add_user_gender(callback: types.CallbackQuery, state: FSMContext):
 
     markup = types.InlineKeyboardMarkup().add(back_button)
 
-    await callback.message.answer(text, reply_markup=markup)
+    await message.answer(text, reply_markup=markup)
     await UserAddState.add_country.set()
 
 
@@ -292,6 +337,9 @@ async def add_user_photo(message: Message, state: FSMContext):
             street = data['street']
             middle_name = data['middle_name']
             gender = data['gender']
+            birth_date = data['birth_date']
+            birth_city = data['birth_city']
+            birth_country = data['birth_country']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -311,6 +359,9 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'surname': surname,
                 'middle_name': middle_name,
                 'gender': gender,
+                'birth_date': birth_date,
+                'birth_city': birth_city,
+                'birth_country': birth_country,
                 'photo_url': photo_url,
                 'family_status': family_status,
                 'country': country,

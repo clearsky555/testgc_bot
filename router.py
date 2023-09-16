@@ -22,6 +22,9 @@ dp.register_message_handler(hs.set_user_data, state=UserAddState.add_user)
 dp.register_message_handler(hs.add_user_name, state=UserAddState.add_user_name)
 dp.register_message_handler(hs.add_user_surname, state=UserAddState.add_user_surname)
 dp.register_message_handler(hs.add_user_middle_name, state=UserAddState.add_user_middle_name)
+dp.register_message_handler(hs.add_birth_date, state=UserAddState.add_birth_date)
+dp.register_message_handler(hs.add_birth_city, state=UserAddState.add_birth_city)
+dp.register_message_handler(hs.add_birth_country, state=UserAddState.add_birth_country)
 dp.register_message_handler(hs.add_country, state=UserAddState.add_country)
 dp.register_message_handler(hs.add_city, state=UserAddState.add_city)
 dp.register_message_handler(hs.add_street, state=UserAddState.add_street)
@@ -45,6 +48,7 @@ dp.register_callback_query_handler(
     state=UserAddState.user_language
 )
 
+# family status
 dp.register_callback_query_handler(
     hs.process_user_family_status,
     lambda c: c.data == 'single',
@@ -66,6 +70,7 @@ dp.register_callback_query_handler(
     state=UserAddState.process_user_family_status,
 )
 
+# language select
 dp.register_callback_query_handler(
     hs.welcome_message,
     lambda c: c.data == 'russian',
@@ -78,18 +83,14 @@ dp.register_callback_query_handler(
     state=UserAddState.user_language,
 )
 
+# cancel
 dp.register_callback_query_handler(
     hs.restart_bot,
     lambda c: c.data == 'cancel',
     state=UserAddState,
 )
 
-# dp.register_callback_query_handler(
-#     hs.back_to_welcome_message,
-#     lambda c: c.data == 'back',
-#     state=UserAddState,
-# )
-
+# back
 dp.register_callback_query_handler(
     hs.set_user_data,
     lambda c: c.data == 'back_to_name',
