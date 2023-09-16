@@ -8,7 +8,7 @@ from transliterate import translit
 from googletrans import Translator
 
 
-from bot_utils.keyboards import get_menu_button, get_family_status_button, get_language_button
+from bot_utils.keyboards import *
 
 from state import UserAddState
 
@@ -98,7 +98,7 @@ async def set_user_data(callback: types.CallbackQuery, state):
     async with state.proxy() as data:
         language = data['language']
         if language == 'russian':
-            text = 'Пожалуйста, введите ваше имя'
+            text = 'Пожалуйста, введите ваше имя (first_name)'
             back_text = 'Назад'
         else:
             text = 'Атыңызды киргизиниз(введите имя)'
@@ -121,7 +121,7 @@ async def add_user_name(message: Message, state: FSMContext):
         print(data)
         language = data['language']
         if language == 'russian':
-            text = 'введите вашу фамилию'
+            text = 'введите вашу фамилию(last_name)'
             back_text = 'Назад'
         else:
             text = 'Тегерегиңизди киргизиңиз(введите фамилию)'
@@ -132,15 +132,50 @@ async def add_user_name(message: Message, state: FSMContext):
 
     await message.answer(text, reply_markup=markup)
 
-    # await UserAddState.add_user_surname.set()
     await UserAddState.add_user_surname.set()
 
 
-async def add_user_surname(message: Message, state: FSMContext):
+async def add_user_surname(message: Message, state:FSMContext):
     async with state.proxy() as data:
         surname = message.text
         surname = translit(surname, language_code='ru', reversed=True)
         data['surname'] = surname
+
+        # middle_name = message.text
+        # middle_name = translit(middle_name, language_code='ru', reversed=True)
+        # data['middle_name'] = middle_name
+        text = 'введите ваше отчество(middle_name)'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = types.InlineKeyboardMarkup().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+
+    await UserAddState.add_user_middle_name.set()
+
+
+async def add_user_middle_name(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        middle_name = message.text
+        middle_name = translit(middle_name, language_code='ru', reversed=True)
+        data['middle_name'] = middle_name
+        text = 'укажите ваш пол(gender)'
+        back_text = 'Назад'
+
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+
+    markup = get_gender_button().add(back_button)
+
+    await message.answer(text, reply_markup=markup)
+    await UserAddState.add_user_gender.set()
+
+
+async def add_user_gender(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        gender = callback.data
+        data['gender'] = gender
+
         language = data['language']
         if language == 'russian':
             text = 'укажите вашу страну'
@@ -153,7 +188,7 @@ async def add_user_surname(message: Message, state: FSMContext):
 
     markup = types.InlineKeyboardMarkup().add(back_button)
 
-    await message.answer(text, reply_markup=markup)
+    await callback.message.answer(text, reply_markup=markup)
     await UserAddState.add_country.set()
 
 
@@ -255,6 +290,8 @@ async def add_user_photo(message: Message, state: FSMContext):
             country = data['country']
             city = data['city']
             street = data['street']
+            middle_name = data['middle_name']
+            gender = data['gender']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -272,6 +309,8 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'telegram_user_id': telegram_user_id,
                 'name': name,
                 'surname': surname,
+                'middle_name': middle_name,
+                'gender': gender,
                 'photo_url': photo_url,
                 'family_status': family_status,
                 'country': country,

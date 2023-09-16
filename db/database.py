@@ -26,6 +26,8 @@ class UsersManager:
             Column('telegram_user_id', BigInteger),
             Column('name', String(100)),
             Column('surname', String(100)),
+            Column('middle_name', String(100)),
+            Column('gender', String(50)),
             Column('family_status', String(100)),
             Column('country', String(100)),
             Column('city', String(255)),

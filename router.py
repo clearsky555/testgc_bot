@@ -21,6 +21,7 @@ dp.register_message_handler(hs.language_selection, commands=['start'])
 dp.register_message_handler(hs.set_user_data, state=UserAddState.add_user)
 dp.register_message_handler(hs.add_user_name, state=UserAddState.add_user_name)
 dp.register_message_handler(hs.add_user_surname, state=UserAddState.add_user_surname)
+dp.register_message_handler(hs.add_user_middle_name, state=UserAddState.add_user_middle_name)
 dp.register_message_handler(hs.add_country, state=UserAddState.add_country)
 dp.register_message_handler(hs.add_city, state=UserAddState.add_city)
 dp.register_message_handler(hs.add_street, state=UserAddState.add_street)
@@ -93,4 +94,17 @@ dp.register_callback_query_handler(
     hs.set_user_data,
     lambda c: c.data == 'back_to_name',
     state=UserAddState,
+)
+
+# gender select
+dp.register_callback_query_handler(
+    hs.add_user_gender,
+    lambda c: c.data == 'male',
+    state=UserAddState.add_user_gender,
+)
+
+dp.register_callback_query_handler(
+    hs.add_user_gender,
+    lambda c: c.data == 'female',
+    state=UserAddState.add_user_gender,
 )

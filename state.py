@@ -6,6 +6,8 @@ class UserAddState(StatesGroup):
     add_user = State()
     add_user_name = State()
     add_user_surname = State()
+    add_user_middle_name = State()
+    add_user_gender = State()
     process_user_family_status = State()
     add_user_photo = State()
     user_language = State()

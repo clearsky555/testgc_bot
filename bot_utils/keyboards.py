@@ -33,6 +33,14 @@ def get_menu_button(language):
     return markup
 
 
+def get_gender_button():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    male = types.InlineKeyboardButton('мужской(male)', callback_data='male')
+    female = types.InlineKeyboardButton('женский(female)', callback_data='female')
+    markup.add(male, female)
+    return markup
+
+
 def get_family_status_button(language):
     markup = types.InlineKeyboardMarkup(row_width=1)
     if language == 'russian':
