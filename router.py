@@ -54,7 +54,7 @@ dp.register_callback_query_handler(
 # family status
 dp.register_callback_query_handler(
     hs.process_user_family_status,
-    lambda c: c.data == 'single',
+    lambda c: c.data == 'unmarried',
     state=UserAddState.process_user_family_status,
 )
 dp.register_callback_query_handler(
@@ -70,6 +70,11 @@ dp.register_callback_query_handler(
 dp.register_callback_query_handler(
     hs.process_user_family_status,
     lambda c: c.data == 'widowed',
+    state=UserAddState.process_user_family_status,
+)
+dp.register_callback_query_handler(
+    hs.process_user_family_status,
+    lambda c: c.data == 'legally separated',
     state=UserAddState.process_user_family_status,
 )
 
@@ -124,4 +129,56 @@ dp.register_callback_query_handler(
     hs.eligibility,
     lambda c: c.data == 'claiming_eligibility',
     state=UserAddState.eligibility,
+)
+
+# education
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'p_s_only',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'h_s_no_degree',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'h_s',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'v_s',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'some_u_courses',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'u_d',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 's_g_l_c',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'm_d',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 's_d_l_c',
+    state=UserAddState.education_level,
+)
+dp.register_callback_query_handler(
+    hs.education_level,
+    lambda c: c.data == 'd_d',
+    state=UserAddState.education_level,
 )

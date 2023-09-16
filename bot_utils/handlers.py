@@ -314,7 +314,7 @@ async def country_where_live(message: Message, state: FSMContext):
         country_where_live = message.text
         country_where_live = translit(country_where_live, language_code='ru', reversed=True)
         data['country_where_live'] = country_where_live
-        text = 'укажите ваш email'
+        text = 'укажите ваш email(email address)'
         back_text = 'Назад'
 
     back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
@@ -327,6 +327,18 @@ async def email(message: Message, state: FSMContext):
     async with state.proxy() as data:
         email = message.text
         data['email'] = email
+        text = 'укажите вашу наивысшую степень образования(highest level of education)'
+        back_text = 'Назад'
+    back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
+    markup = get_level_education_button().add(back_button)
+    await message.answer(text, reply_markup=markup)
+    await UserAddState.education_level.set()
+
+
+async def education_level(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        education_level = callback.data
+        data['education_level'] = education_level
         language = data['language']
         if language == 'russian':
             text = 'укажите ваше семейное положение'
@@ -338,7 +350,7 @@ async def email(message: Message, state: FSMContext):
     back_button = types.InlineKeyboardButton(back_text, callback_data='back_to_name')
 
     markup = get_family_status_button(language=data['language']).add(back_button)
-    await message.answer(text, reply_markup=markup)
+    await callback.message.answer(text, reply_markup=markup)
     async with state.proxy() as data:
         data['awaiting_family_status'] = True
     await UserAddState.process_user_family_status.set()
@@ -384,6 +396,7 @@ async def add_user_photo(message: Message, state: FSMContext):
             country_of_eligibility = data['country_of_eligibility']
             country_where_live = data['country_where_live']
             email = data['email']
+            education_level = data['education_level']
 
             unique_filename = str(uuid.uuid4())
             filename = f"{unique_filename}"
@@ -414,6 +427,7 @@ async def add_user_photo(message: Message, state: FSMContext):
                 'street': street,
                 'country_where_live': country_where_live,
                 'email': email,
+                'education_level': education_level,
             }
             users_manager.record_user_in_db(user_data)
             await message.answer('Данные успешно записаны в базу данных!')
